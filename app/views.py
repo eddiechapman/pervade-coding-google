@@ -1,5 +1,5 @@
 import os
-from flask import render_template, flash, redirect, url_for, session
+from flask import render_template, flash, redirect, url_for, session, request
 import requests
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
@@ -19,7 +19,7 @@ def login():
 
     # Load credentials from the session.
     credentials = google.oauth2.credentials.Credentials(
-        **flask.session['credentials'])
+        **session['credentials'])
 
     # This may be moved to a seperate view
     # Initialize the Google API
@@ -44,7 +44,7 @@ def authorize():
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         app.config['CLIENT_SECRETS_FILE'], app.config['SCOPES'])
 
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+    flow.redirect_uri = url_for('oauth2callback', _external=True)
 
     authorization_url, state = flow.authorization_url(
         # Enable offline access so that you can refresh an access token without
@@ -54,30 +54,30 @@ def authorize():
         include_granted_scopes='false')
 
     # Store the state so the callback can verify the auth server response.
-    flask.session['state'] = state
+    session['state'] = state
 
-    return flask.redirect(authorization_url)
+    return redirect(authorization_url)
 
 
 @app.route('/oauth2callback')
 def oauth2callback():
     # Specify the state when creating the flow in the callback so that it can
     # verified in the authorization server response.
-    state = flask.session['state']
+    state = session['state']
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         app.config['CLIENT_SECRETS_FILE'], app.config['SCOPES'], state)
-    flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
+    flow.redirect_uri = url_for('oauth2callback', _external=True)
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
-    authorization_response = flask.request.url
+    authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
 
     # Store credentials in the session.
     # ACTION ITEM: In a production app, you likely want to save these
     #              credentials in a persistent database instead.
     credentials = flow.credentials
-    flask.session['credentials'] = {
+    session['credentials'] = {
         'token': credentials.token,
         'refresh_token': credentials.refresh_token,
         'token_uri': credentials.token_uri,
@@ -86,17 +86,17 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    return flask.redirect(flask.url_for('login'))
+    return redirect(url_for('login'))
 
 
 @app.route('/logout')
 def logout():
-    if 'credentials' not in flask.session:
+    if 'credentials' not in session:
         return ('You need to <a href="/authorize">authorize</a> before ' +
                 'testing the code to revoke credentials.')
 
     credentials = google.oauth2.credentials.Credentials(
-        **flask.session['credentials'])
+        **session['credentials'])
 
     revoke = requests.post('https://accounts.google.com/o/oauth2/revoke',
         params={'token': credentials.token},
