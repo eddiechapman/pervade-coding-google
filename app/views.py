@@ -42,7 +42,7 @@ def login():
 def authorize():
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES)
+        app.config['CLIENT_SECRETS_FILE'], app.config['SCOPES'])
 
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
 
@@ -66,7 +66,7 @@ def oauth2callback():
     state = flask.session['state']
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+        app.config['CLIENT_SECRETS_FILE'], app.config['SCOPES'], state)
     flow.redirect_uri = flask.url_for('oauth2callback', _external=True)
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
