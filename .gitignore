@@ -1,2 +1,3 @@
 *.pyc
 instance/
+client_secret.json
