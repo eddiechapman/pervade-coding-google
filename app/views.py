@@ -14,8 +14,8 @@ def index():
 
 @app.route('/login')
 def login():
-    if 'credentials' not in flask.session:
-        return flask.redirect('authorize')
+    if 'credentials' not in session:
+        return redirect('authorize')
 
     # Load credentials from the session.
     credentials = google.oauth2.credentials.Credentials(
