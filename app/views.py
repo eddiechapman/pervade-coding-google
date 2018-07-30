@@ -66,7 +66,7 @@ def oauth2callback():
     state = session['state']
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        app.config['CLIENT_SECRETS_FILE'], app.config['SCOPES'], state)
+        app.config['CLIENT_SECRETS_FILE'], app.config['SCOPES'], state=state)
     flow.redirect_uri = url_for('oauth2callback', _external=True)
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
