@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField, SubmitField
 
-class LoginForm(FlaskForm):
+class CodingForm(FlaskForm):
     pervasive_data = BooleanField('Pervasive data')
     data_science = BooleanField('Data science')
     big_data = BooleanField('Big data')
