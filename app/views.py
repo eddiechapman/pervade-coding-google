@@ -51,16 +51,18 @@ def next_award():
     results = service.spreadsheets().values().get(
         spreadsheetId='11nf3AlDsj_E53rlmReC1cq4nevIg8quGpn46tR2MwSs',
         # TO DO: range currently limited for ease of development
-        range='A2:I5',
+        range='Sheet1',
         majorDimension='ROWS'
     ).execute()
 
     # Store values in a list of dictionaries
     rows = results['values']
     awards = []
-    for row in rows:
+    # Row number is used for writing data.
+    # Assumes that entire sheet is requested and row 1 is a header
+    for i, row in enumerate(rows, 2):
         award = {}
-        award = {}
+        award['row_number'] = i
         award['pi_last_name'] = row[0]
         award['pi_first_name'] = row[1]
         award['contact'] = row[2]
