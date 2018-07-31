@@ -5,6 +5,7 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 from app import app
+from app.forms import CodingForm
 
 @app.route('/')
 @app.route('/index')
@@ -14,6 +15,22 @@ def index():
 
 @app.route('/login')
 def login():
+    if 'credentials' not in session:
+        return redirect('authorize')
+
+    return redirect('coding')
+
+
+@app.route('/coding')
+def coding():
+    if 'credentials' not in session:
+        return redirect('authorize')
+
+    return render_template('coding.html')
+
+
+@app.route('/next_award', methods=['GET', 'POST'])
+def next_award():
     if 'credentials' not in session:
         return redirect('authorize')
 
@@ -30,15 +47,41 @@ def login():
 
     session['credentials'] = credentials_to_dict(credentials)
 
-    # Pull values from spreadsheet
+    # Pull all values from spreadsheet
     results = service.spreadsheets().values().get(
         spreadsheetId='11nf3AlDsj_E53rlmReC1cq4nevIg8quGpn46tR2MwSs',
-        range='A1:I5',
+        # TO DO: range currently limited for ease of development
+        range='A2:I5',
         majorDimension='ROWS'
     ).execute()
 
-    # Display a sample result
-    return results['values'][0][0]
+    # Store values in a list of dictionaries
+    rows = results['values']
+    awards = []
+    for row in rows:
+        award = {}
+        award = {}
+        award['pi_last_name'] = row[0]
+        award['pi_first_name'] = row[1]
+        award['contact'] = row[2]
+        award['pi_email'] = row[3]
+        award['organization'] = row[4]
+        award['program'] = row[5]
+        award['title'] = row[6]
+        award['abstract'] = row[7]
+        award['award_number'] = row[8]
+        awards.append(award)
+
+    # Retrieve a single award from total spreadsheet results
+    next_award = awards.pop()
+
+    form = CodingForm()
+
+    if form.submit():
+        flash(form.big_data.data)
+
+    # Refresh the coding page with award data
+    return render_template('coding.html', award=next_award, form=form)
 
 
 @app.route('/authorize')
@@ -109,13 +152,13 @@ def logout():
         flash('An error occurred.')
         return render_template('index.html')
 
+
 @app.route('/clear')
 def clear_credentials():
     if 'credentials' in session:
         del session['credentials']
     flash ('Credentials have been cleared.')
     return render_template('index.html')
-
 
 
 def credentials_to_dict(credentials):
