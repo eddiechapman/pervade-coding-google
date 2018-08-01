@@ -21,10 +21,25 @@ def login():
     return redirect('coding')
 
 
+def update_current_row():
+
+    else:
+        session['current_row'] += 1
+    current_row = session['current_row']
+    current_row = str(current_row)
+    current_row = 'Sheet1!A' + current_row + ':N' + current_row
+    print(current_row)
+
+    return current_row
+
+
 @app.route('/coding', methods=['GET', 'POST'])
 def coding():
     if 'credentials' not in session:
         return redirect('authorize')
+
+    if 'current_row' not in session:
+        session['current_row'] = 2
 
     # Call API and retrieve data for one award
     service = initialize_api()
@@ -37,6 +52,7 @@ def coding():
         current_row = session['current_row']
         # Is changing to a string necessary?
         current_row = str(current_row)
+        # Must manually be set to the empty columns in the google sheet
         range = 'Sheet1!J' + current_row + ':O' + current_row
 
         values = [
@@ -175,14 +191,18 @@ def initialize_api():
 
 
 def call_api(service):
+    # Set request variables
+    spreadsheet_id = app.config['SPREADSHEET_ID']
     header_row = app.config['HEADER_ROW']
-    current_row = update_current_row()
-    range_names = [header_row, current_row]
+    current_row = session['current_row']
+    ranges = [header_row, current_row]
+    major_dimension = app.config['MAJOR_DIMENSION']
 
+    # Call API with request variables
     request = service.spreadsheets().values().batchGet(
-        spreadsheetId=app.config['SPREADSHEET_ID'],
-        ranges=range_names,
-        majorDimension='ROWS'
+        spreadsheetId=spreadsheet_id,
+        ranges=ranges,
+        majorDimension=major_dimension
     )
     results = request.execute()
 
@@ -199,14 +219,3 @@ def sort_results(results):
     return award
 
 
-def update_current_row():
-    if 'current_row' not in session:
-        session['current_row'] = 2
-    else:
-        session['current_row'] += 1
-    current_row = session['current_row']
-    current_row = str(current_row)
-    current_row = 'Sheet1!A' + current_row + ':N' + current_row
-    print(current_row)
-
-    return current_row
