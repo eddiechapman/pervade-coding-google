@@ -21,18 +21,6 @@ def login():
     return redirect('coding')
 
 
-def update_current_row():
-
-    else:
-        session['current_row'] += 1
-    current_row = session['current_row']
-    current_row = str(current_row)
-    current_row = 'Sheet1!A' + current_row + ':N' + current_row
-    print(current_row)
-
-    return current_row
-
-
 @app.route('/coding', methods=['GET', 'POST'])
 def coding():
     if 'credentials' not in session:
@@ -41,46 +29,14 @@ def coding():
     if 'current_row' not in session:
         session['current_row'] = 2
 
-    # Call API and retrieve data for one award
     service = initialize_api()
-    results = call_api(service)
+    results = request_award_data(service)
     award = sort_results(results)
-
     form = CodingForm()
 
     if request.method == 'POST':
-        current_row = session['current_row']
-        # Is changing to a string necessary?
-        current_row = str(current_row)
-        # Must manually be set to the empty columns in the google sheet
-        range = 'Sheet1!J' + current_row + ':O' + current_row
-
-        values = [
-            form.pervasive_data.data,
-            form.data_science.data,
-            form.big_data.data,
-            form.case_study.data,
-            form.data_synonyms.data,
-            # Records current date and time in UTC standard format
-            str(datetime.utcnow())
-        ]
-
-        value_range = [values]
-
-        value_range_body = {
-            "range": range,
-            "majorDimension": 'ROWS',
-            "values": value_range
-        }
-
-        api_request = service.spreadsheets().values().update(
-            spreadsheetId=app.config['SPREADSHEET_ID'],
-            valueInputOption='RAW',
-            range=range,
-            body=value_range_body
-        )
-        response = api_request.execute()
-
+        write_coding_data(service, form)
+        session['current_row'] += 1
         flash('Coding data submitted for award' + award['title'])
         return redirect(url_for('coding'))
 
@@ -175,6 +131,7 @@ def credentials_to_dict(credentials):
         'scopes': credentials.scopes
             }
 
+
 def initialize_api():
     # Load credentials from the session.
     credentials = google.oauth2.credentials.Credentials(**session['credentials'])
@@ -184,38 +141,84 @@ def initialize_api():
         app.config['API_VERSION'],
         credentials=credentials
     )
-
     session['credentials'] = credentials_to_dict(credentials)
 
     return service
 
 
-def call_api(service):
+def request_award_data(service):
     # Set request variables
     spreadsheet_id = app.config['SPREADSHEET_ID']
-    header_row = app.config['HEADER_ROW']
-    current_row = session['current_row']
-    ranges = [header_row, current_row]
+    header_range = app.config['HEADER_ROW']
+    current_range = current_read_range()
+    ranges = [header_range, current_range]
     major_dimension = app.config['MAJOR_DIMENSION']
 
     # Call API with request variables
-    request = service.spreadsheets().values().batchGet(
+    request_read = service.spreadsheets().values().batchGet(
         spreadsheetId=spreadsheet_id,
         ranges=ranges,
         majorDimension=major_dimension
     )
-    results = request.execute()
+    results = request_read.execute()
 
     return results
 
 
 def sort_results(results):
     award = {}
-    header = results['valueRanges'][0]['values'][0]
-    data = results['valueRanges'][1]['values'][0]
-    for h, d in zip(header, data):
-        award[h] = d
+    column_names = results['valueRanges'][0]['values'][0]
+    current_row = results['valueRanges'][1]['values'][0]
+    for name, cell in zip(column_names, current_row):
+        award[name] = cell
 
     return award
+
+
+def current_read_range():
+    return 'Sheet1!A{0}:{1}{0}'.format(
+        session['current_row'],
+        app.config['COLUMN_READ_END']
+    )
+
+def current_write_range():
+    return 'Sheet1!{1}{0}:{2}{0}'.format(
+        session['current_row'],
+        app.config['COLUMN_WRITE_START'],
+        app.config['COLUMN_WRITE_END']
+    )
+
+def write_coding_data(service, form):
+    # API request variables
+    spreadsheet_id = app.config['SPREADSHEET_ID']
+    range = current_write_range()
+    major_dimension = app.config['MAJOR_DIMENSION']
+    value_input_option = 'RAW'
+    print(range)
+
+    # Data to be written
+    value_range_body = {
+        "range": range,
+        "majorDimension": major_dimension,
+        "values": [[
+            form.pervasive_data.data,
+            form.data_science.data,
+            form.big_data.data,
+            form.case_study.data,
+            form.data_synonyms.data,
+            # Records current date and time in UTC standard format
+            str(datetime.utcnow())
+        ]]
+    }
+    # Send request
+    request_write = service.spreadsheets().values().update(
+        spreadsheetId=spreadsheet_id,
+        valueInputOption=value_input_option,
+        range=range,
+        body=value_range_body
+    )
+    # Execute request
+    response = request_write.execute()
+
 
 
