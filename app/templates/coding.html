@@ -2,7 +2,7 @@
 
 {% block content %}
 <div>
-    <a href="{{ url_for('next_award') }}">Skip</a>
+    <a href="{{ url_for('coding') }}">Skip</a>
     <a href="{{ url_for('index') }}">Save</a>
     <a href="{{ url_for('logout') }}">Quit</a>
 </div>
@@ -14,17 +14,17 @@
     <p><b>Program: </b>{{ award.program }}</p>
     <p><b>Organization: </b>{{ award.organization }}</p>
     <p><b>PI: </b>{{ award.pi_first_name }} {{ award.pi_last_name }}</p>
-    <p><b>Email: </b>{{ award.email }}</p>
+    <p><b>Email: </b>{{ award.pi_email }}</p>
 </div>
 <div>
     <form action="" method="post">
-        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
         <p>{{ form.pervasive_data.label }} {{ form.pervasive_data }}</p>
         <p>{{ form.data_science.label }} {{ form.data_science }}</p>
         <p>{{ form.big_data.label }} {{ form.big_data }}</p>
         <p>{{ form.case_study.label }} {{ form.case_study }}</p>
         <p>{{ form.data_synonyms.label }} {{ form.data_synonyms(size=300) }}</p>
-        <p>{{ form.submit() }}</p>
+        <input type="submit" value="Submit">
     </form>
 </div>
 {% endif %}
