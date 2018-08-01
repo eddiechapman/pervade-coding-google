@@ -29,14 +29,18 @@ def coding():
     if 'current_row' not in session:
         session['current_row'] = 2
 
+    if 'user' not in session:
+        session['user'] = 'Please select your name'
+
     service = initialize_api()
     results = request_award_data(service)
     award = sort_results(results)
-    form = CodingForm()
+    form = CodingForm(user=session['user'])
 
     if request.method == 'POST':
         write_coding_data(service, form)
         session['current_row'] += 1
+        session['user'] = form.user.data
         flash('Coding data submitted for award' + award['title'])
         return redirect(url_for('coding'))
 
@@ -118,7 +122,6 @@ def clear_credentials():
         del session['credentials']
     flash ('Credentials have been cleared.')
     return render_template('index.html')
-
 
 
 def credentials_to_dict(credentials):
@@ -207,7 +210,8 @@ def write_coding_data(service, form):
             form.case_study.data,
             form.data_synonyms.data,
             # Records current date and time in UTC standard format
-            str(datetime.utcnow())
+            str(datetime.utcnow()),
+            form.user.data
         ]]
     }
     # Send request
