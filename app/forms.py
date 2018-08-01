@@ -7,4 +7,3 @@ class CodingForm(FlaskForm):
     big_data = BooleanField('Big data')
     case_study = BooleanField('Flag for PRIM&R case study')
     data_synonyms = StringField('Data synonyms')
-    submit = SubmitField('Save')
