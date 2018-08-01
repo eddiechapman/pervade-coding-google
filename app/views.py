@@ -25,46 +25,47 @@ def coding():
     if 'credentials' not in session:
         return redirect('authorize')
 
-    # Load credentials from the session.
-    credentials = google.oauth2.credentials.Credentials(**session['credentials'])
-
-    # Initialize the Google API
-    service = googleapiclient.discovery.build(
-        app.config['API_SERVICE_NAME'],
-        app.config['API_VERSION'],
-        credentials=credentials
-    )
-
-    header_row = 'Sheet1!A1:N1'
-    current_row = update_current_row()
-    range_names = [header_row, current_row]
-
-    results = service.spreadsheets().values().batchGet(
-        spreadsheetId='11nf3AlDsj_E53rlmReC1cq4nevIg8quGpn46tR2MwSs',
-        ranges=range_names,
-        majorDimension='ROWS'
-    ).execute()
-
-    award = {}
-    header = results['valueRanges'][0]['values'][0]
-    data = results['valueRanges'][1]['values'][0]
-    for h, d in zip(header, data):
-        award[h] = d
-    print(award)
-
-    session['credentials'] = credentials_to_dict(credentials)
+    # Call API and retrieve data for one award
+    service = initialize_api()
+    results = call_api(service)
+    award = sort_results(results)
 
     form = CodingForm()
 
     if request.method == 'POST':
-        print('1')
+        current_row = session['current_row']
+        # Is changing to a string necessary?
+        current_row = str(current_row)
+        range = 'Sheet1!J' + current_row + ':N' + current_row
+
+        values = [
+            form.pervasive_data.data,
+            form.data_science.data,
+            form.big_data.data,
+            form.case_study.data,
+            form.data_synonyms.data
+        ]
+
+        value_range = [values]
+
+        value_range_body = {
+            "range": range,
+            "majorDimension": 'ROWS',
+            "values": value_range
+        }
+
+        api_request = service.spreadsheets().values().update(
+            spreadsheetId=app.config['SPREADSHEET_ID'],
+            valueInputOption='RAW',
+            range=range,
+            body=value_range_body
+        )
+        response = api_request.execute()
+
         flash('Coding data submitted for award' + award['title'])
         return redirect(url_for('coding'))
 
-    print('2')
-    # Refresh the coding page with award data
     return render_template('coding.html', award=award, form=form)
-
 
 
 @app.route('/authorize')
@@ -155,7 +156,44 @@ def credentials_to_dict(credentials):
         'scopes': credentials.scopes
             }
 
+def initialize_api():
+    # Load credentials from the session.
+    credentials = google.oauth2.credentials.Credentials(**session['credentials'])
 
+    service = googleapiclient.discovery.build(
+        app.config['API_SERVICE_NAME'],
+        app.config['API_VERSION'],
+        credentials=credentials
+    )
+
+    session['credentials'] = credentials_to_dict(credentials)
+
+    return service
+
+
+def call_api(service):
+    header_row = app.config['HEADER_ROW']
+    current_row = update_current_row()
+    range_names = [header_row, current_row]
+
+    request = service.spreadsheets().values().batchGet(
+        spreadsheetId=app.config['SPREADSHEET_ID'],
+        ranges=range_names,
+        majorDimension='ROWS'
+    )
+    results = request.execute()
+
+    return results
+
+
+def sort_results(results):
+    award = {}
+    header = results['valueRanges'][0]['values'][0]
+    data = results['valueRanges'][1]['values'][0]
+    for h, d in zip(header, data):
+        award[h] = d
+
+    return award
 
 
 def update_current_row():
@@ -169,22 +207,3 @@ def update_current_row():
     current_row = 'Sheet1!A' + current_row + ':N' + current_row
 
     return current_row
-
-
-
-    # Row number is used for writing data.
-    # Assumes that entire sheet is requested and row 1 is a header
-    # for i, row in enumerate(rows, 2):
-    #     award = {}
-    #     award['row_number'] = i
-    #     award['pi_last_name'] = row[0]
-    #     award['pi_first_name'] = row[1]
-    #     award['contact'] = row[2]
-    #     award['pi_email'] = row[3]
-    #     award['organization'] = row[4]
-    #     award['program'] = row[5]
-    #     award['title'] = row[6]
-    #     award['abstract'] = row[7]
-    #     award['award_number'] = row[8]
-    #     awards.append(award)
-
