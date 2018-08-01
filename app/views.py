@@ -1,6 +1,7 @@
 import os
 from flask import render_template, session, redirect, url_for, request, flash
 import requests
+from datetime import datetime
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -36,14 +37,16 @@ def coding():
         current_row = session['current_row']
         # Is changing to a string necessary?
         current_row = str(current_row)
-        range = 'Sheet1!J' + current_row + ':N' + current_row
+        range = 'Sheet1!J' + current_row + ':O' + current_row
 
         values = [
             form.pervasive_data.data,
             form.data_science.data,
             form.big_data.data,
             form.case_study.data,
-            form.data_synonyms.data
+            form.data_synonyms.data,
+            # Records current date and time in UTC standard format
+            str(datetime.utcnow())
         ]
 
         value_range = [values]
@@ -201,9 +204,9 @@ def update_current_row():
         session['current_row'] = 2
     else:
         session['current_row'] += 1
-    print(session['current_row'])
     current_row = session['current_row']
     current_row = str(current_row)
     current_row = 'Sheet1!A' + current_row + ':N' + current_row
+    print(current_row)
 
     return current_row
