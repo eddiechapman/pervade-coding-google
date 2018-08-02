@@ -1,31 +1,54 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-{% block content %}
-<div>
-    <a href="{{ url_for('skip') }}">Skip Record</a>
-</div>
-{% if award %}
-<div>
-    <p><b>Title: </b>{{ award.title }}</p>
-    <p><b>Number: </b>{{ award.award_id }}</p>
-    <p><b>Abstract: </b>{{ award.abstract }}</p>
-    <p><b>Program: </b>{{ award.program }}</p>
-    <p><b>Organization: </b>{{ award.organization }}</p>
-    <p><b>PI: </b>{{ award.pi_first_name }} {{ award.pi_last_name }}</p>
-    <p><b>Email: </b>{{ award.pi_email }}</p>
-</div>
-<div>
-    <form action="" method="post">
-        {{ form.csrf_token }}
-        <p>{{ form.pervasive_data.label }} {{ form.pervasive_data }}</p>
-        <p>{{ form.data_science.label }} {{ form.data_science }}</p>
-        <p>{{ form.big_data.label }} {{ form.big_data }}</p>
-        <p>{{ form.case_study.label }} {{ form.case_study }}</p>
-        <p>{{ form.data_synonyms.label }} {{ form.data_synonyms(size=300) }}</p>
-        <p>{{ form.award_relevance.label }} {{ form.award_relevance }}</p>
-        <p>{{ form.user.label }} {{ form.user }}</p>
-        <input type="submit" value="Submit">
-    </form>
-</div>
-{% endif %}
+{% block app_content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="pull-left">
+                    <a href="{{ url_for('skip') }}">Skip Record</a>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="pull-right">
+                    <ul class="list-inline">
+                        <li>{{ award.program }}</li>
+                        <li>{{ award.award_id }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4>{{ award.title }}</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="list-inline">
+                    <li><strong>{{ award.pi_first_name }} {{ award.pi_last_name }}</strong></li>
+                    <li><em>{{ award.organization }}</em></li>
+                    <li>{{ award.pi_email }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p>{{ award.abstract }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
+
+
+
+
+

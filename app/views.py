@@ -46,7 +46,7 @@ def coding():
         write_coding_data(service, form)
         session['current_row'] += 1
         session['user'] = form.user.data
-        flash('Coding data submitted for award' + award['title'])
+        flash('Coding data submitted for award ' + award['award_id'])
         return redirect(url_for('coding'))
 
     return render_template('coding.html', award=award, form=form)
@@ -111,13 +111,17 @@ def logout():
         return ('You need to <a href="/authorize">authorize</a> before ' +
                 'testing the code to revoke credentials.')
 
-    credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    credentials = google.oauth2.credentials.Credentials(
+        **session['credentials'])
 
-    revoke = requests.post('https://accounts.google.com/o/oauth2/revoke',
+    revoke = requests.post(
+        'https://accounts.google.com/o/oauth2/revoke',
         params={'token': credentials.token},
-        headers = {'content-type': 'application/x-www-form-urlencoded'})
+        headers = {'content-type': 'application/x-www-form-urlencoded'}
+    )
 
     status_code = getattr(revoke, 'status_code')
+    print(status_code)
     if status_code == 200:
         flash('Credentials successfully revoked.')
         return render_template('index.html')

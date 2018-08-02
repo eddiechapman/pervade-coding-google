@@ -1,20 +1,32 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div>
-    <h2>Coding</h2>
-    <p><a href="{{ url_for('coding') }}">Click here to code NSF award data.</a></p>
+{% block app_content %}
+<div class="text-center"
+<div class="container">
+    <div class="row">
+       <ul class="list-inline">
+           <li><h3>Coding</h3></li>
+           <li><h4><a href="{{ url_for('coding') }}">Click here to code NSF award data.</a></h4></li>
+       </ul>
+    </div>
+    <div class="row">
+        <ul class="list-inline">
+            <li><h3>Log in</h3></li>
+            <li><h4><a href="{{ url_for('login') }}">Click here to log in.</a></h4></li>
+        </ul>
+    </div>
+    <div class="row">
+        <ul class="list-inline">
+            <li><h3>Log out</h3></li>
+            <li><h4><a href="{{ url_for('logout') }}">Click here to log out.</a></h4></li>
+        </ul>
+    </div>
+    <div class="row">
+        <ul class="list-inline">
+            <li><h3>Clear credentials</h3></li>
+            <li><h4><a href="{{ url_for('clear_credentials') }}">Click here clear Flask credentials.</a></h4></li>
+        </ul>
+    </div>
 </div>
-<div>
-    <h1>Log in</h1>
-    <p><a href="{{ url_for('login') }}">Click here to log in.</a></p>
-</div>
-<div>
-    <h2>Log out</h2>
-    <p><a href="{{ url_for('logout') }}">Click here to log out.</a></p>
-</div>
-<div>
-    <h2>Clear credentials</h2>
-    <p><a href="{{ url_for('clear_credentials') }}">Click here clear Flask credentials.</a></p>
 </div>
 {% endblock %}
