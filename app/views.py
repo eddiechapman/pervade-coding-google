@@ -94,7 +94,6 @@ def oauth2callback():
     return redirect(url_for('login'))
 
 
-# TODO: This doesn't seem to be working. Able to call API afterward w/o logging in.
 @app.route('/logout')
 def logout():
     if 'credentials' not in session:
@@ -115,13 +114,13 @@ def logout():
         flash('An error occurred.')
         return render_template('index.html')
 
-
-@app.route('/clear')
-def clear_credentials():
-    if 'credentials' in session:
-        del session['credentials']
-    flash ('Credentials have been cleared.')
-    return render_template('index.html')
+# Removed for now. Doesn't seem useful to user.
+# @app.route('/clear')
+# def clear_credentials():
+#     if 'credentials' in session:
+#         del session['credentials']
+#     flash ('Credentials have been cleared.')
+#     return render_template('index.html')
 
 
 def credentials_to_dict(credentials):
