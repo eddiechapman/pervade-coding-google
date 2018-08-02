@@ -210,7 +210,8 @@ def write_coding_data(service, form):
             form.data_synonyms.data,
             # Records current date and time in UTC standard format
             str(datetime.utcnow()),
-            form.user.data
+            form.user.data,
+            form.award_relevance.data
         ]]
     }
     # Send request
