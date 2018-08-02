@@ -7,4 +7,5 @@ class CodingForm(FlaskForm):
     big_data = BooleanField('Big data')
     case_study = BooleanField('Flag for PRIM&R case study')
     data_synonyms = StringField('Data synonyms')
+    award_relevance = BooleanField('This award is not relevant to PERVADE')
     user = SelectField('User', choices=[('Default','Please select your name'), ('EC','Eddie'), ('Else','Stranger')])
