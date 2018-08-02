@@ -18,6 +18,7 @@ def index():
 def login():
     if 'credentials' not in session:
         return redirect('authorize')
+    flash('You are already logged in')
     return redirect('coding')
 
 
@@ -35,6 +36,10 @@ def coding():
     service = initialize_api()
     results = request_award_data(service)
     award = sort_results(results)
+
+    if 'timestamp' in award:
+        return redirect(url_for('skip'))
+
     form = CodingForm(user=session['user'])
 
     if request.method == 'POST':
@@ -45,6 +50,12 @@ def coding():
         return redirect(url_for('coding'))
 
     return render_template('coding.html', award=award, form=form)
+
+
+@app.route('/skip')
+def skip():
+    session['current_row'] += 1
+    return redirect(url_for('coding'))
 
 
 @app.route('/authorize')
