@@ -114,13 +114,13 @@ def logout():
         flash('An error occurred.')
         return render_template('index.html')
 
-# Removed for now. Doesn't seem useful to user.
-# @app.route('/clear')
-# def clear_credentials():
-#     if 'credentials' in session:
-#         del session['credentials']
-#     flash ('Credentials have been cleared.')
-#     return render_template('index.html')
+
+@app.route('/clear')
+def clear_credentials():
+    if 'credentials' in session:
+        del session['credentials']
+    flash ('Credentials have been cleared.')
+    return render_template('index.html')
 
 
 def credentials_to_dict(credentials):
