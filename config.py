@@ -1,5 +1,7 @@
-DEBUG = True
+import os
 
+DEBUG = True
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # Google Sheets API authentication variables
 CLIENT_SECRETS_FILE = 'client_secret.json' or os.environ.get('CLIENT_SECRETS_FILE')
