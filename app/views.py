@@ -9,7 +9,7 @@ import googleapiclient.discovery
 from app import app
 from app.forms import CodingForm
 
-@app.route('/')
+
 @app.route('/index')
 def index():
     return render_template('index.html')
