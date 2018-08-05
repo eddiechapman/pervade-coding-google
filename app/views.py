@@ -140,6 +140,10 @@ def initialize_api():
 
 
 def request_award_data(service):
+
+    credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    session['credentials'] = credentials_to_dict(credentials)
+
     # Set request variables
     spreadsheet_id = app.config['SPREADSHEET_ID']
     header_range = app.config['HEADER_ROW']
@@ -182,6 +186,9 @@ def current_write_range():
     )
 
 def write_coding_data(service, form):
+    credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    session['credentials'] = credentials_to_dict(credentials)
+
     # API request variables
     spreadsheet_id = app.config['SPREADSHEET_ID']
     range = current_write_range()
@@ -214,6 +221,9 @@ def write_coding_data(service, form):
     )
     # Execute request
     response = request_write.execute()
+
+    credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    session['credentials'] = credentials_to_dict(credentials)
 
 
 
