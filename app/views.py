@@ -38,8 +38,6 @@ def coding():
     results = request_award_data(service)
     award = sort_results(results)
 
-    session['credentials'] = credentials_to_dict(credentials)
-
     if 'timestamp' in award:
         return redirect(url_for('skip'))
 
@@ -167,6 +165,8 @@ def initialize_api():
         app.config['API_VERSION'],
         credentials=credentials
     )
+
+    session['credentials'] = credentials_to_dict(credentials)
 
     return service
 
