@@ -1,6 +1,6 @@
 import os
 
-DEBUG = True
+DEBUG = False
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # Google Sheets API authentication variables
