@@ -128,13 +128,12 @@ def logout():
     revoke = requests.post(
         'https://accounts.google.com/o/oauth2/revoke',
         params={'token': credentials.token},
-        headers = {'content-type': 'application/x-www-form-urlencoded'}
+        headers={'content-type': 'application/x-www-form-urlencoded'}
     )
 
     status_code = getattr(revoke, 'status_code')
-    print(status_code)
     if status_code == 200:
-        flash('Credentials successfully revoked.')
+        flash('You are now logged out.')
         return render_template('index.html')
     else:
         flash('An error occurred.')
