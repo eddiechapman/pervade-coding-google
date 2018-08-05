@@ -20,7 +20,7 @@ def login():
     if 'credentials' not in session:
         return redirect('authorize')
     flash('You are already logged in')
-    return redirect('coding')
+    return render_template('index.html')
 
 
 @app.route('/coding', methods=['GET', 'POST'])
