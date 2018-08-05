@@ -62,7 +62,7 @@ def skip():
 @app.route('/authorize')
 def authorize():
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
-    client_secrets = json.loads(app.config['CLIENT_SECRETS_FILE'])
+    client_secrets = json.dumps(app.config['CLIENT_SECRETS_FILE'])
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         client_secrets,
@@ -90,7 +90,7 @@ def oauth2callback():
     # verified in the authorization server response.
     state = session['state']
 
-    client_secrets = json.loads(app.config['CLIENT_SECRETS_FILE'])
+    client_secrets = json.dumps(app.config['CLIENT_SECRETS_FILE'])
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
         client_secrets,
