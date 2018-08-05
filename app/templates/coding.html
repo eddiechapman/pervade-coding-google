@@ -9,7 +9,23 @@
                     <a href="{{ url_for('skip') }}">Skip Record</a>
                 </div>
             </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h4>{{ award.title }}</h4>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-8">
+                <div class="pull-left">
+                    <ul class="list-inline">
+                        <li><strong>{{ award.pi_first_name }} {{ award.pi_last_name }}</strong></li>
+                        <li><em>{{ award.organization }}</em></li>
+                        <li>{{ award.pi_email }}</li>
+                    </ul>
+                </div>
+            </div>
+             <div class="col-md-4">
                 <div class="pull-right">
                     <ul class="list-inline">
                         <li>{{ award.program }}</li>
@@ -20,22 +36,11 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <h4>{{ award.title }}</h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <ul class="list-inline">
-                    <li><strong>{{ award.pi_first_name }} {{ award.pi_last_name }}</strong></li>
-                    <li><em>{{ award.organization }}</em></li>
-                    <li>{{ award.pi_email }}</li>
-                </ul>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
                 <p>{{ award.abstract }}</p>
             </div>
+        </div>
+         <div class="row">
+             <hr class="col-xs-12">
         </div>
     </div>
     <div class="container">
