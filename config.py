@@ -2,7 +2,7 @@ DEBUG = True
 
 
 # Google Sheets API authentication variables
-CLIENT_SECRETS_FILE = 'client_secret.json'
+CLIENT_SECRETS_FILE = 'client_secret.json' or os.environ.get('CLIENT_SECRETS_FILE')
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 API_SERVICE_NAME = 'sheets'
 API_VERSION = 'v4'
