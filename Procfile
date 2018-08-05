@@ -1,1 +1,1 @@
-web: gunicorn pervade_coding:run
+web: gunicorn app:app
