@@ -19,7 +19,7 @@ def index():
 def login():
     if 'credentials' not in session:
         return redirect('authorize')
-    flash('You are currently logged in')
+    flash('You are currently authorized')
     return render_template('index.html')
 
 
@@ -111,38 +111,6 @@ def oauth2callback():
     session['credentials'] = credentials_to_dict(credentials)
 
     return redirect(url_for('login'))
-
-
-@app.route('/logout')
-def logout():
-    if 'credentials' not in session:
-        flash('You are currently logged out.')
-        return render_template('index.html')
-
-    credentials = google.oauth2.credentials.Credentials(
-        **session['credentials'])
-
-    revoke = requests.post(
-        'https://accounts.google.com/o/oauth2/revoke',
-        params={'token': credentials.token},
-        headers={'content-type': 'application/x-www-form-urlencoded'}
-    )
-
-    status_code = getattr(revoke, 'status_code')
-    if status_code == 200:
-        flash('You are now logged out.')
-        return render_template('index.html')
-    else:
-        flash('An error occurred.')
-        return render_template('index.html')
-
-
-@app.route('/clear')
-def clear_credentials():
-    if 'credentials' in session:
-        del session['credentials']
-    flash ('Credentials have been cleared.')
-    return render_template('index.html')
 
 
 def credentials_to_dict(credentials):
