@@ -1,4 +1,5 @@
 import os
+import json
 from flask import render_template, session, redirect, url_for, request, flash
 import requests
 from datetime import datetime
@@ -61,8 +62,12 @@ def skip():
 @app.route('/authorize')
 def authorize():
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
+    client_secrets = json.loads(app.config['CLIENT_SECRETS_FILE'])
+
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        app.config['CLIENT_SECRETS_FILE'], scopes=app.config['SCOPES'])
+        client_secrets,
+        scopes=app.config['SCOPES']
+    )
 
     flow.redirect_uri = url_for('oauth2callback', _external=True)
 
@@ -85,8 +90,10 @@ def oauth2callback():
     # verified in the authorization server response.
     state = session['state']
 
+    client_secrets = json.loads(app.config['CLIENT_SECRETS_FILE'])
+
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        app.config['CLIENT_SECRETS_FILE'],
+        client_secrets,
         app.config['SCOPES'],
         state=state
     )
