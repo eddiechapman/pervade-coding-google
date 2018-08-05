@@ -19,7 +19,7 @@ def index():
 def login():
     if 'credentials' not in session:
         return redirect('authorize')
-    flash('You are already logged in')
+    flash('You are currently logged in')
     return render_template('index.html')
 
 
@@ -92,6 +92,7 @@ def oauth2callback():
     # Specify the state when creating the flow in the callback so that it can
     # verified in the authorization server response.
     state = session['state']
+
     client_secrets = json.loads(app.config['CLIENT_SECRETS_FILE'])
 
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
@@ -99,6 +100,7 @@ def oauth2callback():
         app.config['SCOPES'],
         state=state
     )
+
     flow.redirect_uri = url_for('oauth2callback', _external=True)
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
@@ -117,8 +119,8 @@ def oauth2callback():
 @app.route('/logout')
 def logout():
     if 'credentials' not in session:
-        return ('You need to <a href="/authorize">authorize</a> before ' +
-                'testing the code to revoke credentials.')
+        flash('You are currently logged out.')
+        return render_template('index.html')
 
     credentials = google.oauth2.credentials.Credentials(
         **session['credentials'])
