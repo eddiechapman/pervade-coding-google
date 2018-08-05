@@ -44,11 +44,14 @@ def coding():
     form = CodingForm(user=session['user'])
 
     if request.method == 'POST':
+        session['credentials'] = credentials_to_dict(credentials)
         write_coding_data(service, form)
         session['current_row'] += 1
         session['user'] = form.user.data
         flash('Coding data submitted for award ' + award['award_id'])
         return redirect(url_for('coding'))
+
+    session['credentials'] = credentials_to_dict(credentials)
 
     return render_template('coding.html', award=award, form=form)
 
